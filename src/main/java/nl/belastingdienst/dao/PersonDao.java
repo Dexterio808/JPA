@@ -26,22 +26,22 @@ public class PersonDao implements Dao<Person> {
 
     @Override
     public void save(Person person) {
-        em.getTransaction().begin();
-        em.persist(person);
-        em.getTransaction().commit();
+        performTransaction(() -> em.persist(person));
     }
 
     @Override
     public void update(Person person) {
-        em.getTransaction().begin();
-        em.merge(find(person.getId()));
-        em.getTransaction().commit();
+        performTransaction(() -> em.merge(person));
     }
 
     @Override
     public void delete(Person person) {
+        performTransaction(() -> em.remove(person));
+    }
+
+    public void performTransaction(Runnable runnable){
         em.getTransaction().begin();
-        em.remove(find(person.getId()));
+        runnable.run();
         em.getTransaction().commit();
     }
 }
